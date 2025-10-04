@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NutriTrack | Sign Up</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+  <section class="bg-white shadow-xl rounded-lg p-8 w-full max-w-md">
+    <!-- Logo & Branding -->
+    <div class="flex flex-col items-center mb-6">
+      <img src="img/ChatGPT Image Sep 17, 2025, 11_37_50 PM.png" 
+           alt="NutriTrack Logo" 
+           width="60" 
+           height="60" 
+           class="rounded-full shadow-md mb-2">
+      <h1 class="text-3xl font-bold text-[#10b981]">NutriTrack</h1>
+      <p class="text-gray-600 text-center text-sm mt-2">
+        Create an account to start tracking your nutrients
+      </p>
+    </div>
+
+    <!-- Signup Form -->
+    <form id="signupForm" class="space-y-4">
+      <div>
+        <label for="fullName" class="block text-sm font-medium text-gray-700">Full Name</label>
+        <input type="text" id="fullName" name="fullName" placeholder="Enter your full name"
+          class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-[#10b981] focus:border-[#10b981]" required>
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email"
+          class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-[#10b981] focus:border-[#10b981]" required>
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+        <input type="password" id="password" name="password" placeholder="Create a password"
+          class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-[#10b981] focus:border-[#10b981]" required>
+      </div>
+
+      <div>
+        <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter password"
+          class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-[#10b981] focus:border-[#10b981]" required>
+      </div>
+
+      <!-- Signup Button -->
+      <button type="submit" 
+        class="w-full bg-[#10b981] text-white py-2 px-4 rounded-md font-semibold hover:bg-[#059669] transition">
+        Sign Up
+      </button>
+    </form>
+
+    <!-- Divider -->
+    <div class="flex items-center my-6">
+      <hr class="flex-1 border-gray-300">
+      <span class="px-2 text-sm text-gray-500">or</span>
+      <hr class="flex-1 border-gray-300">
+    </div>
+
+    <!-- Redirect to Login -->
+    <p class="text-center text-sm text-gray-600">
+      Already have an account? 
+      <a href="login.html" class="text-[#10b981] font-medium hover:underline">Log in</a>
+    </p>
+  </section>
+<script type="module" src="signup.js">
+
+</script>
+</body>
+</html>

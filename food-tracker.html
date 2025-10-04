@@ -1,12 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Document</title>
-              <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NutriTrack</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<script src="food-tracker.js" type="module"></script>            
+
+<body class="bg-[#f9fafb]">
+  <header>
+    <nav class="bg-white p-3 shadow-lg border-b border-gray-200 fixed top-0 w-full z-10">
+      <div class="flex justify-between max-w-6xl mx-auto">
+        <div class="flex items-center space-x-3">
+          <img src="img/ChatGPT Image Sep 17, 2025, 11_37_50 PM.png" alt="Apple" width="50" height="50" class="rounded-full" />
+          <p class="font-bold text-[24px] text-black">NutriTrack</p>
+        </div>
+        <div>
+          <button id="" class="text-[16px] mt-2 font-medium py-2 px-4 rounded-full text-white bg-[#10b981] hover:bg-[#059669] transition">
+            Get Started
+          </button>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+ <main class="px-4 pt-36 max-w-6xl mx-auto">
+    <section class="">
+      <div class="bg-white p-4 rounded-lg shadow-lg">
+        <h1 class="text-black text-[25px] font-bold">Today's Progress</h1>
+      </div>
+    </section>
+<sup>hfhfh</sup>
+    <section>
+      <div class="bg-white p-4 rounded-t-lg mt-5 shadow-md">
+        <div class="flex items-center justify-between">
+          <p class="text-[20px] font-bold">Food Log</p>
+          <button id="openAddFood" class="bg-[#10b981] p-2 px-4 rounded-md text-[17px] font-medium text-white">
+            <div class="flex gap-3">
+              <img src="img/icons8-plus-24 (1).png" alt="" width="8" height="6" class="w-4 h-4 mt-1" />
+              Add Food
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- List container -->
+      <div id="foodList" class="bg-white p-4 rounded-b-lg shadow-md"></div>
+    </section>
+  </main>
+
+  <!-- Modal (hidden by default) -->
+  <section id="addFoodModal" class="hidden">
+    <div class="h-screen w-full fixed px-4 top-0 inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+      <div class="bg-white p-3 w-full max-w-md rounded-lg">
+        <div class="flex items-center justify-between">
+          <p class="text-[19px] font-bold">Add Food</p>
+          <button id="closeAddFood" class="border-2 border-gray-500 rounded-md p-1">
+            <img src="img/icons8-cancel-50 (5).png" alt="" width="20" height="20" />
+          </button>
+        </div>
+
+        <hr class="mt-3"/>
+
+        <form id="foodForm" class="py-4">
+          <div class="grid grid-cols-1 gap-2">
+            <label for="foodName" class="font-bold text-black">Food Name</label>
+            <input id="foodName" name="foodName" type="text" class="p-2 mt-2 w-full rounded-md border-2 border-gray-300" placeholder="Enter Food Name" required />
+
+            <label for="calories" class="font-bold text-black mt-3">Calories</label>
+            <input id="calories" name="calories" type="number" min="0" step="1" class="p-2 mt-2 w-full rounded-md border-2 border-gray-300" placeholder="Enter Calories" required />
+
+            <label for="date" class="font-bold text-black mt-3">Date</label>
+            <input id="date" name="date" type="date" class="p-2 mt-2 w-full rounded-md border-2 border-gray-300" />
+
+           <div>
+  <label for="foodImage" class="cursor-pointer inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition">
+    <!-- Upload SVG -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12V4m0 0l-4 4m4-4l4 4" />
+    </svg>
+    Upload Image
+  </label>
+
+  <!-- Hidden file input -->
+  <input type="file" id="foodImage" name="foodImage" accept="image/*" class="hidden" />
+</div>
+
+          </div>
+
+          <div class="mt-4">
+            <button type="submit" class="bg-[#10b981] p-2 px-4 rounded-md text-[17px] font-medium text-white">
+              <span class="flex gap-3">
+                <img src="img/icons8-plus-24 (1).png" alt="" width="8" height="6" class="w-4 h-4 mt-1" />
+                Add Food
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Load the JS as an ES module -->
+  <script type="module" src="food-tracker.js"></script>
 </body>
 </html>
