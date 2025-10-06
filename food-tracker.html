@@ -1,12 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Document</title>
-              <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NutriTrack Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<script src="food-tracker.js" type="module"></script>            
+
+<body class="bg-gray-50 min-h-screen">
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md fixed top-0 w-full z-10 border-b border-gray-200">
+    <div class="flex justify-between items-center max-w-6xl mx-auto px-4 py-3">
+      <div class="flex items-center gap-3">
+        <img src="img/ChatGPT Image Sep 17, 2025, 11_37_50 PM.png" alt="NutriTrack Logo" class="w-10 h-10 rounded-full" />
+        <h1 class="text-2xl font-bold text-gray-800">NutriTrack</h1>
+      </div>
+      <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+        Logout
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="pt-24 px-4 md:px-10 lg:px-24 max-w-6xl mx-auto">
+    
+    <!-- Dashboard header -->
+    <section class="mb-6">
+      <h2 class="text-3xl font-bold text-gray-800">Welcome back 👋</h2>
+      <p class="text-gray-600 mt-1">Here’s your nutrition summary for today.</p>
+    </section>
+
+    <!-- Progress Section -->
+    <section class="mb-8">
+      <div class="bg-white p-6 rounded-xl shadow-md">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h3 class="text-xl font-semibold text-gray-800">Today's Progress</h3>
+            <p class="text-gray-500">Track your calorie goal below</p>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <p class="text-gray-700 font-medium">1,240 / 2,000 kcal</p>
+            <div class="w-48 bg-gray-200 h-3 rounded-full overflow-hidden">
+              <div class="bg-green-500 h-3 rounded-full transition-all duration-500" style="width: 62%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    
+    
+
+    <!-- Food Log Section -->
+    <section class="mb-12">
+      <div class="flex items-center justify-between bg-white p-4 rounded-t-xl shadow-md">
+        <h3 class="text-lg font-semibold text-gray-800">Food Log</h3>
+        <button id="openAddFood" class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+          <img src="img/icons8-plus-24 (1).png" alt="+" class="w-5 h-5" />
+          Add Food
+        </button>
+      </div>
+        <div id="foodStats" class="max-w-4xl mx-auto my-6"></div>
+      <div id="foodList" class="bg-white p-4 rounded-b-xl shadow-md min-h-[200px]">
+      
+        
+        <!-- Dynamic food cards will be rendered here -->
+      </div>
+    </section>
+
+    
+  </main>
+
+  <!-- Add Food Modal -->
+  <section id="addFoodModal" class="hidden">
+    <div class="h-screen w-full fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+      <div class="bg-white p-5 w-full max-w-md rounded-lg shadow-lg">
+        <div class="flex items-center justify-between mb-3">
+          <h4 class="text-xl font-semibold text-gray-800">Add Food</h4>
+          <button id="closeAddFood" class="text-gray-500 hover:text-gray-700">
+            ✖
+          </button>
+        </div>
+
+        <hr class="mb-4" />
+
+        <form id="foodForm">
+          <label class="block mb-2 font-medium text-gray-800">Food Name</label>
+          <input type="text" id="foodName" name="foodName" required
+                 class="w-full border-2 border-gray-300 rounded-md p-2 mb-4 focus:border-green-500 outline-none" />
+
+          <label class="block mb-2 font-medium text-gray-800">Calories</label>
+          <input type="number" id="calories" name="calories" required min="0"
+                 class="w-full border-2 border-gray-300 rounded-md p-2 mb-4 focus:border-green-500 outline-none" />
+
+          <label class="block mb-2 font-medium text-gray-800">Date</label>
+          <input type="date" id="date" name="date"
+                 class="w-full border-2 border-gray-300 rounded-md p-2 mb-4 focus:border-green-500 outline-none" />
+
+          <label class="block mb-2 font-medium text-gray-800">Image</label>
+          <input type="file" id="foodImage" name="foodImage" accept="image/*"
+                 class="w-full border-2 border-gray-300 rounded-md p-2 mb-4 cursor-pointer" />
+
+          <button type="submit" class="bg-green-600 text-white w-full py-2 rounded-md font-medium hover:bg-green-700 transition">
+            Add Food
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- JS -->
+  <script type="module" src="food-tracker.js"></script>
 </body>
 </html>
