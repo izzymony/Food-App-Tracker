@@ -4,7 +4,16 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 document.addEventListener("DOMContentLoaded", async() =>{
+
+try{              
 const {data:{session}} = await supabase.auth.getSession();
+if(sessionError) throw sessionError
+
+const user = session?.user;
+if(!user){
+  window.location.href = "login.html";
+  return;
+}
 
 const {data:profile, error} = await supabase.from("profiles")
 .select("*").eq("id", user.id).single();
@@ -17,5 +26,9 @@ if(error) {
 
 document.getElementById("displayName").value = profile.display_name || "";
 document.getElementById("email").value = profile.email || "";
-
+}catch(error){
+ console.error("Error during profile load:", error.message);
+ alert("Session expired or not logged in. Please log in again.");     
+ window.location.href = "login.html";                    
+}
 })
