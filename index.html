@@ -3,227 +3,199 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tailwind Example</title>
+  <title>NutriTrack</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class=""  >
+<body class="bg-white text-gray-800">
   <!-- Navbar -->
   <header>
-    <nav class="bg-white p-3 shadow-lg border-b border-gray-200 fixed top-0 w-full z-10 ">
-      <div class="flex gap-4 justify-between w-full ">
-        
-        <!-- Logo + Title -->
-        <div class="flex flex-col-2 ">
-          <img src="img/ChatGPT Image Sep 17, 2025, 11_37_50 PM.png" alt="Apple" width="50" height="50" class="rounded-full">
-          <p class="font-bold text-[18px] mt-3 text-black">NutriTrack</p>
+    <nav class="bg-white p-3 shadow-lg border-b border-gray-200 fixed top-0 w-full z-10">
+      <div class="flex justify-between items-center max-w-6xl mx-auto">
+        <!-- Logo -->
+        <div class="flex items-center gap-2">
+          <img src="img/ChatGPT Image Sep 17, 2025, 11_37_50 PM.png" alt="Logo" width="48" height="48" class="rounded-full">
+          <p class="font-bold text-[20px] text-black">NutriTrack</p>
         </div>
-        
-        <!-- Button -->
-        <div class="grid grid-cols-2 ">
+
+        <!-- Buttons -->
+        <div class="flex gap-3">
           <a href="login.html">
-          <button class="text-[16px] mt-2 font-medium py-2 px-4 rounded-full text-white bg-[#10b981] hover:bg-[#059669] transition">
-           login
-          </button>
+            <button class="text-[16px] font-medium py-2 px-5 rounded-full text-white bg-[#10b981] hover:bg-[#059669] transition">
+              Login
+            </button>
           </a>
           <a href="signup.html">
-          <button class="text-[16px] mt-2 font-medium py-2 px-4 rounded-full text-white bg-[#10b981] hover:bg-[#059669] transition">
-            Signup 
-          </button>
+            <button class="text-[16px] font-medium py-2 px-5 rounded-full text-white bg-[#10b981] hover:bg-[#059669] transition">
+              Signup
+            </button>
           </a>
         </div>
-       
       </div>
     </nav>
   </header>
 
-  <!-- Page Content -->
-  <main class="">
-    <section 
-      class="pt-28 pb-14 px-4 md:px-16 lg:px-24"
-      style="background: linear-gradient(to bottom right, #f0fef7, white, #f7fbff);"
-    >
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center max-w-6xl mx-auto">
+  <!-- Hero Section -->
+  <main>
+    <section class="pt-28 pb-20 px-4 md:px-16 lg:px-24 bg-gradient-to-br from-[#f0fef7] via-white to-[#f7fbff]">
+      <div class="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
         
-        <!-- Left Content -->
+        <!-- Left -->
         <div>
-          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-[3.5rem] md:leading-[4rem] text-gray-800">
-            Track your 
-            <span 
-              class="text-transparent bg-clip-text"         style="background-image: linear-gradient(to right,#17b193, #299ac4 ); -webkit-background-clip: text; color: transparent;"
-            >
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-gray-800">
+            Track your
+            <span class="bg-clip-text text-transparent bg-gradient-to-r from-[#17b193] to-[#299ac4]">
               Nutrition
             </span> Journey
           </h1>
-          <p class="mt-4 text-base md:text-lg text-gray-600 leading-[28px] md:leading-[32px]">
+          <p class="mt-4 text-gray-600 text-lg leading-relaxed">
             Transform your health with intelligent food tracking. Monitor calories, nutrients, and achieve your wellness goals with our comprehensive nutrition platform.
           </p>
 
           <!-- Buttons -->
-          <div class="flex flex-col gap-4 sm:flex-row sm:gap-6 md:gap-8 w-full sm:w-auto">
-            <button class="flex items-center justify-center gap-2 px-6 py-4 mt-6 sm:mt-0 bg-[#10b981] text-white rounded-full font-medium text-lg hover:bg-[#059669] transition w-full sm:w-auto">
-              Start Tracking Today
-              <img src="img/icons8-right-arrow-50.png" alt="" class="mt-1" width="30" height="30">
+          <div class="flex flex-col sm:flex-row gap-4 mt-8">
+            <button class="flex items-center justify-center gap-2 px-6 py-4 bg-[#10b981] text-white rounded-full font-medium text-lg hover:bg-[#059669] transition">
+              Start Tracking
+              <img src="img/icons8-right-arrow-50.png" alt="" width="26" height="26">
             </button>
-
-            <button class="flex items-center justify-center gap-2 px-6 py-4 mt-2 sm:mt-0 bg-transparent border-2 border-gray-200 text-black rounded-full font-medium text-lg transition hover:border-green-500 hover:text-green-500 w-full sm:w-auto">
+            <button class="flex items-center justify-center gap-2 px-6 py-4 border-2 border-gray-300 text-black rounded-full font-medium text-lg hover:border-[#10b981] hover:text-[#10b981] transition">
               Watch Demo
             </button>
           </div>
         </div>
 
-      
-
-
-        <!-- Right Card -->
-        <div class="max-w-md md:max-w-lg bg-white rounded-2xl mx-auto shadow-lg overflow-hidden transform transition duration-500 hover:animate-[tilt_1s_infinite_alternate]">
-          <!-- Image -->
-          <img src="https://images.unsplash.com/photo-1543353071-873f17a7a088?auto=format&fit=crop&w=800&q=80" 
-              alt="Food" 
-              class="w-full h-48 sm:h-56 md:h-64 object-cover">
-
-          <!-- Content -->
-          <div class="p-4">
-            <h2 class="text-lg md:text-xl font-semibold text-gray-800">Today's Progress</h2>
-            <p class="text-gray-500 text-sm md:text-base">Calories</p>
-
-            <!-- Progress -->
-            <div class="flex items-center justify-between mt-2">
-              <div class="w-full bg-gray-200 h-2 rounded-full mr-2 overflow-hidden">
-                <div class="bg-green-500 h-2 rounded-full w-0 animate-[grow_2s_forwards]"></div>
+        <!-- Right -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden max-w-md mx-auto transform hover:scale-105 transition">
+          <img src="https://images.unsplash.com/photo-1543353071-873f17a7a088?auto=format&fit=crop&w=800&q=80"
+            alt="Healthy Food" class="w-full h-64 object-cover">
+          <div class="p-5">
+            <h2 class="text-xl font-semibold text-gray-800">Today's Progress</h2>
+            <p class="text-gray-500 text-sm mt-1">Calories</p>
+            <div class="flex items-center gap-2 mt-3">
+              <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                <div class="bg-[#10b981] h-2 rounded-full animate-[grow_2s_forwards]"></div>
               </div>
-              <span class="text-gray-700 text-sm md:text-base">1,240 / 2,000</span>
+              <span class="text-gray-700 text-sm">1,240 / 2,000</span>
             </div>
           </div>
         </div>
-
-      </div>
-    </section>
-   
-    <section class="pt-12">
-      <div class="">
-        <h1 class="text-black font-bold text-[34px] mt-5 text-center">Powerful Features</h1>
-        <p class="text-gray-500 text-[20px]  text-center">Everything you need to succeed on your nutrition journey</p>
-
-        <div class="px-4 mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 max-w-6xl ">
-          <div class="p-4 rounded-[20px] bg-[#e3fcf0]  hover:shadow-lg">
-            <div class="bg-[#10b981] w-fit rounded-md p-2">
-              <img src="img/icons8-analytics-48.png" alt="" width="25" height="25">
-             
-            </div>
-             <h1 class="text-[17px] text-black text-[20px] font-medium mt-2">Smart Analytics</h1>
-              <p class="mt-2 leading-[2rem]"> Get detailed insights into your nutrition patterns with advanced analytics and personalized recommendations</p>
-          </div>
-          <div class="p-4 rounded-[20px] bg-[#e8f2ff] hover:shadow-lg ">
-            <div class="bg-[#3b82f5] w-fit rounded-md p-2">
-              <img src="img/icons8-goal-50.png" alt="" width="25" height="25">
-             
-            </div>
-             <h1 class="text-[17px] text-black text-[20px] font-medium mt-2">Goal Tracking</h1>
-              <p class="mt-2 leading-[2rem]"> Set and achieve your health goal and tracking and milestone celebration system</p>
-          </div>
-          <div class="p-4 rounded-[20px] bg-[#fff3e5] hover:shadow-lg ">
-            <div class="bg-[#f97316] w-fit rounded-md p-2">
-              <img src="img/icons8-time-50 (2).png" alt="" width="25" height="25">
-             
-            </div>
-             <h1 class="text-[17px] text-black text-[20px] font-medium mt-2">Quick Logging</h1>
-              <p class="mt-2 leading-[2rem]">Log your meals in seconds with our intuitive interface and extensive ood database</p>
-          </div>
-          <div class="p-4 rounded-[20px] bg-[#e3fcf0] hover:shadow-lg ">
-            <div class="bg-[#10b981] w-fit rounded-md p-2">
-              <img src="img/icons8-analytics-48.png" alt="" width="25" height="25">
-             
-            </div>
-             <h1 class="text-[17px] text-black text-[20px] font-medium mt-2">Smart Analytics</h1>
-              <p class="mt-2 leading-[2rem]"> Get detailed insights into your nutrition patterns with advanced analytics and personalized recommendations</p>
-          </div>
-        </div>
-
       </div>
     </section>
 
-    <section class="bg-[#f9fafb] py-12 mt-24 px-4">
-      <div class="sm:flex sm:items-center sm:justify-between max-w-6xl mx-auto">
-      <h1 class="text-black font-bold text-[36px]">Why Choose NutriTrack</h1>
+    <!-- Features Section -->
+    <section class="py-20 px-4 bg-white">
+      <div class="max-w-6xl mx-auto text-center">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-3">Powerful Features</h1>
+        <p class="text-gray-500 text-lg mb-10">Everything you need to succeed on your nutrition journey</p>
 
-      <div class="">
-        <div class="">
-          <div class="flex gap-4 mt-4">
-          <div class="">
-          <img src="img/icons8-checkmark-50.png" alt="" width="20" height="20" class="w-full mt-3 w-6 h-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Card 1 -->
+          <div class="bg-[#e3fcf0] p-6 rounded-2xl hover:shadow-lg transition">
+            <div class="bg-[#10b981] p-2 rounded-md inline-block">
+              <img src="img/icons8-analytics-48.png" alt="" width="25">
+            </div>
+            <h3 class="text-xl font-semibold mt-3">Smart Analytics</h3>
+            <p class="text-gray-600 mt-2 leading-relaxed">
+              Get insights into your nutrition patterns with advanced analytics and personalized recommendations.
+            </p>
           </div>
-          <div class=" mt-1">
-          <h1 class="text-black font-medium text-[22px]">Evidence-Based Approach</h1>
-          <p class="text-[18px] mt-2 text-gray-330">Built on nutritional science and validated by health professionals worldwide. </p>
-          </div>
-        </div>
 
-          <div class="flex gap-4 mt-4">
-          <div class="">
-          <img src="img/icons8-checkmark-50.png" alt="" width="20" height="20" class="w-full mt-3 w-6 h-6">
+          <!-- Card 2 -->
+          <div class="bg-[#e8f2ff] p-6 rounded-2xl hover:shadow-lg transition">
+            <div class="bg-[#3b82f6] p-2 rounded-md inline-block">
+              <img src="img/icons8-goal-50.png" alt="" width="25">
+            </div>
+            <h3 class="text-xl font-semibold mt-3">Goal Tracking</h3>
+            <p class="text-gray-600 mt-2 leading-relaxed">
+              Set and achieve your goals with our tracking and milestone system.
+            </p>
           </div>
-          <div class=" mt-1">
-          <h1 class="text-black font-medium text-[22px]">Personalized Experience</h1>
-          <p class="text-[18px] text-gray-330 mt-2">Tailored recommendations based on your unique goals and preferences. </p>
-          </div>
-        </div>
 
-        
-          <div class="flex gap-4 mt-4">
-          <div class="">
-          <img src="img/icons8-checkmark-50.png" alt="" width="20" height="20" class="w-full mt-3 w-6 h-6">
+          <!-- Card 3 -->
+          <div class="bg-[#fff3e5] p-6 rounded-2xl hover:shadow-lg transition">
+            <div class="bg-[#f97316] p-2 rounded-md inline-block">
+              <img src="img/icons8-time-50 (2).png" alt="" width="25">
+            </div>
+            <h3 class="text-xl font-semibold mt-3">Quick Logging</h3>
+            <p class="text-gray-600 mt-2 leading-relaxed">
+              Log your meals in seconds with our intuitive interface and extensive food database.
+            </p>
           </div>
-          <div class=" mt-1">
-          <h1 class="text-black font-medium text-[22px]">Privacy First</h1>
-          <p class="text-[18px] text-gray-330 mt-2">Your data is encrypted and secure. We never share your personal information. </p>
-          </div>
-        </div>
 
-        
-          <div class="flex gap-4 mt-4">
-          <div class="">
-          <img src="img/icons8-checkmark-50.png" alt="" width="20" height="20" class="w-full mt-3 w-6 h-6">
-          </div>
-          <div class=" mt-1">
-          <h1 class="text-black font-medium text-[22px]">Always Improving</h1>
-          <p class="text-[18px] text-gray-330 mt-2">Regular updates with new features based on user feedback and research.</p>
-          </div>
-        </div>
-
-        <img src="img/pexels-photo-1092730.jpeg" alt="" class="rounded-md mt-6">
-        <div class="bg-white p-3 py-3 absolute left-0 -mt-12 w-fit px-3 rounded-lg">
-          <div class="flex gap-2">
-          <img src="img/icons8-dot-24 (2).png" alt="" >
-          <p class="text-black font-bold text-sm">Live health Tracking</p>
+          <!-- Card 4 -->
+          <div class="bg-[#e3fcf0] p-6 rounded-2xl hover:shadow-lg transition">
+            <div class="bg-[#10b981] p-2 rounded-md inline-block">
+              <img src="img/icons8-analytics-48.png" alt="" width="25">
+            </div>
+            <h3 class="text-xl font-semibold mt-3">Smart Reminders</h3>
+            <p class="text-gray-600 mt-2 leading-relaxed">
+              Stay consistent with timely meal reminders and progress nudges.
+            </p>
           </div>
         </div>
-        </div>
-      </div>
       </div>
     </section>
-  </main>  
-</body>
 
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        keyframes: {
-          tilt: {
-            "0%": { transform: "rotate(-2deg)" },
-            "100%": { transform: "rotate(2deg)" }
+    <!-- Why Choose -->
+    <section class="bg-[#f9fafb] py-20 px-4">
+      <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-center">
+        <!-- Left Content -->
+        <div>
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Why Choose NutriTrack</h2>
+          <ul class="space-y-6">
+            <li class="flex items-start gap-3">
+              <img src="img/icons8-checkmark-50.png" alt="" class="w-6 h-6 mt-1">
+              <div>
+                <h3 class="text-xl font-semibold">Evidence-Based Approach</h3>
+                <p class="text-gray-600 text-[17px]">Built on nutritional science and validated by health professionals.</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <img src="img/icons8-checkmark-50.png" alt="" class="w-6 h-6 mt-1">
+              <div>
+                <h3 class="text-xl font-semibold">Personalized Experience</h3>
+                <p class="text-gray-600 text-[17px]">Tailored recommendations based on your goals and preferences.</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <img src="img/icons8-checkmark-50.png" alt="" class="w-6 h-6 mt-1">
+              <div>
+                <h3 class="text-xl font-semibold">Privacy First</h3>
+                <p class="text-gray-600 text-[17px]">Your data is encrypted and secure. We never share it.</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <img src="img/icons8-checkmark-50.png" alt="" class="w-6 h-6 mt-1">
+              <div>
+                <h3 class="text-xl font-semibold">Always Improving</h3>
+                <p class="text-gray-600 text-[17px]">Regular updates with new features based on user feedback.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Right Image -->
+        <div class="relative">
+          <img src="img/pexels-photo-1092730.jpeg" alt="Healthy" class="rounded-xl shadow-lg">
+          <div class="absolute bottom-5 left-5 bg-white px-4 py-2 rounded-lg shadow-md flex items-center gap-2">
+            <img src="img/icons8-dot-24 (2).png" alt="">
+            <p class="font-semibold text-sm text-black">Live Health Tracking</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          keyframes: {
+            grow: { "0%": { width: "0%" }, "100%": { width: "62%" } },
           },
-          grow: {
-            "0%": { width: "0%" },
-            "100%": { width: "62%" } // matches 1240/2000
-          }
+          animation: { grow: "grow 2s forwards" },
         },
-        animation: {
-          tilt: "tilt 1s infinite alternate",
-          grow: "grow 2s forwards"
-        }
-      }
-    }
-  }
-</script>
+      },
+    };
+  </script>
+</body>
 </html>

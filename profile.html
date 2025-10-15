@@ -1,18 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Document</title>
-                <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NutriTrack | Profile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-              <h2 id="profileName" class="text-lg font-bold"></h2>
-<p id="profileEmail" class="text-gray-600"></p>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center px-4">
+  
+  <!-- Profile Card -->
+  <div class="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md border border-gray-100 text-center relative">
+    <!-- Avatar -->
+    <div class="flex justify-center">
+      <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-[#10b981] to-[#34d399] flex items-center justify-center text-white text-4xl font-bold">
+        <span id="avatarInitial">U</span>
+      </div>
+    </div>
 
-<script type="module" src="profile.js">
+    <!-- User Info -->
+    <div id="profileContainer" class="mt-6 space-y-3">
+      <p class="text-gray-500 text-sm">Loading profile...</p>
+    </div>
 
-</script>              
+    <!-- Buttons -->
+    <div class="mt-8 flex flex-col gap-3">
+      <a href="dashboard.html">
+        <button class="w-full bg-[#10b981] text-white py-2 rounded-lg font-medium hover:bg-[#059669] transition">
+          Back to Dashboard
+        </button>
+      </a>
+      <button id="logoutBtn" class="w-full bg-red-500 text-white py-2 rounded-lg font-medium hover:bg-red-600 transition">
+        Logout
+      </button>
+    </div>
+
+    <!-- Footer -->
+    <p class="mt-6 text-sm text-gray-400">© 2025 NutriTrack</p>
+  </div>
+
+  <script type="module" src="profile.js"></script>
 </body>
 </html>
