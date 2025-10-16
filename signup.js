@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
       signupForm.reset()
 
       // Redirect user (optional)
-      window.location.href = "food-tracker.html"
+      window.location.href = "check_email.html"
     } catch (error) {
       console.error("Error during signup:", error.message)
       alert("Signup failed: " + error.message)
