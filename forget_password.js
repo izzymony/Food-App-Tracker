@@ -8,7 +8,8 @@ const form  = document.getElementById("form")
 form.addEventListener("submit", async(e) =>{
   e.preventDefault()
 
-  const email  = document.getElementById("email");
+  const emailInput = document.getElementById("email");
+  const email = emailInput.value.trim()
 
 
   if(!email){
@@ -16,8 +17,8 @@ form.addEventListener("submit", async(e) =>{
      return      
   }
 
-  try{const {data,error}  = await supabase.auth.resetPassworForEmail(email,{
-              redirectTo:"http://localhost:5500/reset-password.html"
+  try{const {data,error}  = await supabase.auth.resetPasswordForEmail(email,{
+              redirectTo:""
   })
 
   if(error) throw error
