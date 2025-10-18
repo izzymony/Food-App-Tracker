@@ -9,18 +9,28 @@
 
 <body class="bg-gray-50 min-h-screen">
   <!-- Navbar -->
-  <nav class="bg-white shadow-md fixed top-0 w-full z-10 border-b border-gray-200">
+  <nav class="bg-white shadow-sm fixed top-0 w-full z-10 border-b border-gray-200">
     <div class="flex justify-between items-center max-w-6xl mx-auto px-4 py-3">
+      <!-- Logo -->
       <div class="flex items-center gap-3">
-        <img src="img/ChatGPT Image Sep 17, 2025, 11_37_50 PM.png" alt="NutriTrack Logo" class="w-10 h-10 rounded-full" />
-        <h1 class="text-2xl font-bold text-gray-800">NutriTrack</h1>
+        <img src="img/ChatGPT Image Sep 17, 2025, 11_37_50 PM.png" alt="NutriTrack Logo" class="w-10 h-10 rounded-full shadow-sm" />
+        <h1 class="text-2xl font-bold text-[#10b981] tracking-tight">NutriTrack</h1>
       </div>
-      <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
-        Logout
-      </button>
+
+      <!-- Navbar Buttons -->
+      <div class="flex gap-3">
+        <a href="profile.html">
+          <button class="bg-[#10b981] text-white px-4 py-2 rounded-lg hover:bg-[#059669] transition flex items-center gap-2">
+            <img src="img/icons8-user-24.png" alt="Profile" class="w-5 h-5"/>
+            Profile
+          </button>
+        </a>
+        <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+          Logout
+        </button>
+      </div>
     </div>
   </nav>
-
   <!-- Main content -->
   <main class="pt-24 px-4 md:px-10 lg:px-24 max-w-6xl mx-auto">
     
