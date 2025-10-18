@@ -16,7 +16,20 @@ if(password !== confirmPassword  && password.length < 8  ){
 
 
 try{
-  const{data, error} = await supabase.auth.            
-}
+  const{data, error} = await supabase.auth.updateUser({password:password})     
+  
+  if(error){
+    alert("password update not successful")
+  }else{
+    alert("✅ Password updated successfully! You can now log in.")
+    window.location.href = "login.html"
+    
+  }
+
+  
+}catch (err) {
+    console.error("Error updating password:", err)
+    alert("❌ Failed to reset password: " + err.message)
+  }
               
 } )

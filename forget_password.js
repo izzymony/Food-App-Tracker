@@ -18,7 +18,7 @@ form.addEventListener("submit", async(e) =>{
   }
 
   try{const {data,error}  = await supabase.auth.resetPasswordForEmail(email,{
-              redirectTo:""
+              redirectTo:"https://fantastic-chainsaw-wrrq675j66q3596p-5500.app.github.dev/confirm_password.html"
   })
 
   if(error) throw error
