@@ -14,10 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.addEventListener("DomContentLoaded", async() =>{
   const status =  document.getElementById("statusMessage");
-  const loginBtn = document.getElementById("loginBtn");
- 
 
- 
   try{
      const hashParams = new URLSearchParams(window.location.hash.substring(1)) ;
      const access_token = hashParams.get("access_token")  
