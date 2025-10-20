@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
         email,
         password,
         options: {
+         emailRedirectTo: "https://nutri-app-tracker.vercel.app/verify_email.html",
           data: {
             full_name: fullName, 
           },
