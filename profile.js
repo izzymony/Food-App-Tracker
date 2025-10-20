@@ -33,11 +33,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (error) throw error
 
     // Set avatar initial
-    avatarInitial.textContent = data.full_name ? data.full_name.charAt(0).toUpperCase() : 'U'
+    avatarInitial.textContent = data.full_name  ? data.full_name.split(" ").splice(0,2).map(word => word.charAt(0).toUpperCase()) // get initials
+      .join(""): "U"
 
     // Display info
     profileContainer.innerHTML = `
-      <h2 class="text-2xl font-bold text-gray-800">${data.full_name || 'No name set'}</h2>
+      <h2 class="text-2xl font-bold text-gray-800">${data.full_name || 'Null'}</h2>
       <p class="text-gray-500">${data.email}</p>
 
       <div class="mt-6 bg-gray-50 p-4 rounded-lg text-left space-y-2 border border-gray-100">
