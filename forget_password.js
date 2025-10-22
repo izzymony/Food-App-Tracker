@@ -19,7 +19,10 @@ form.addEventListener('submit', async (e) => {
     return
   }
 
+
+
   try {
+      
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: "https://nutri-app-tracker.vercel.app/confirm_password.html"
     })
