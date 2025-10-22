@@ -10,13 +10,13 @@ form.addEventListener("submit", async()=>{
  const password = document.getElementById("password").value.trim()          
  const confirmPassword  = document.getElementById("confirmPassword").value.trim()   
 
-if(password !== confirmPassword  && password.length < 8  ){
+if(password !== confirmPassword || password.length < 8  ){
   alert("Passwords must match and be at least 8 characters long!")        
 }
 
 
 try{
-  const{data, error} = await supabase.auth.updateUser({password:password})     
+  const{data, error} = await supabase.auth.updateUser({password})     
   
   if(error){
     alert("password update not successful")
