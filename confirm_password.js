@@ -10,13 +10,15 @@ const {error}  = supabase.auth.onAuthStateChange(async(event,session) =>{
   }
 })
 
-const form  = document.getElementById("form")
+
 
 
 function setupForm(){
-form.addEventListener("submit", async()=>{
+  
+const form  = document.getElementById("form")
+form.addEventListener("submit", async(event)=>{
 
-
+event.preventDefault();
  
  const password = document.getElementById("password").value.trim()          
  const confirmPassword  = document.getElementById("confirmPassword").value.trim()   
