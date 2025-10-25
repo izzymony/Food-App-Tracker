@@ -1,37 +1,44 @@
+// food-tracker.js (complete, fixed, robust)
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 
-// 🔗 Supabase setup
-const supabaseUrl = "https://uvksbskswcsfwuuijbzx.supabase.co";
-const supabaseKey =
+// ---------- CONFIG ----------
+const SUPABASE_URL = "https://uvksbskswcsfwuuijbzx.supabase.co";
+const SUPABASE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2a3Nic2tzd2NzZnd1dWlqYnp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzMjc2MzYsImV4cCI6MjA3MzkwMzYzNn0.s5_4FWzmqYIyQTsaK6nx8ZqYDFGz32Dwr3-QalhJWo0";
 
-const supabase = createClient(supabaseUrl, supabaseKey, {
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, storage: localStorage },
 });
 
-// ⚙️ Constants
 const FOOD_TABLE = "foodCollection";
 const GOAL_TABLE = "user_goal";
 const BUCKET = "images_url";
-let caloriesChart;
- let userGoal = {goal_value:0, goal_type:"daily"}
 
-// ✅ Utility functions
+// ---------- STATE ----------
+let caloriesChart = null;
+let userGoal = { goal_value: 0, goal_type: "daily" };
+
+// ---------- UTILITIES ----------
 function showToast(message, type = "info") {
   const el = document.createElement("div");
   el.textContent = message;
   el.className = `fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded shadow text-white z-[9999] ${
-    type === "error"
-      ? "bg-red-600"
-      : type === "success"
-      ? "bg-emerald-600"
-      : "bg-gray-800"
+    type === "error" ? "bg-red-600" : type === "success" ? "bg-emerald-600" : "bg-gray-800"
   }`;
   document.body.appendChild(el);
-  setTimeout(() => el.remove(), 2000);
+  setTimeout(() => el.remove(), 2500);
 }
 
-let loadingMask;
+function escapeHtml(str) {
+  return String(str || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+let loadingMask = null;
 function showLoading() {
   if (loadingMask) return;
   loadingMask = document.createElement("div");
@@ -46,16 +53,7 @@ function hideLoading() {
   loadingMask = null;
 }
 
-function escapeHtml(str) {
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-// 🧭 Auth session management
+// ---------- AUTH HELPERS ----------
 supabase.auth.onAuthStateChange((event) => {
   if (event === "SIGNED_OUT" || event === "USER_DELETED") {
     showToast("Session expired. Please log in again.", "error");
@@ -71,129 +69,125 @@ async function getValidSession() {
     const { data: refreshed } = await supabase.auth.refreshSession();
     if (refreshed?.session) return refreshed.session.user;
 
+    // no session, sign out and redirect
     await supabase.auth.signOut();
-    showToast("Session expired. Please log in again.", "error");
-    setTimeout(() => (window.location.href = "login.html"), 800);
+    showToast("Session expired. Please log in.", "error");
+    setTimeout(() => (window.location.href = "login.html"), 700);
     return null;
-  } catch (error) {
-    console.error("Session error:", error);
+  } catch (err) {
+    console.error("Session error:", err);
     await supabase.auth.signOut();
     showToast("Session check failed.", "error");
-    setTimeout(() => (window.location.href = "login.html"), 800);
+    setTimeout(() => (window.location.href = "login.html"), 700);
     return null;
   }
 }
 
-
-// MAIN LOGIC
-
+// ---------- MAIN ----------
 document.addEventListener("DOMContentLoaded", async () => {
-  // DOM elements
+  // DOM refs
   const foodForm = document.getElementById("foodForm");
   const foodList = document.getElementById("foodList");
   const modal = document.getElementById("addFoodModal");
   const openAddFoodBtn = document.getElementById("openAddFood");
+  const openAddFoodMobile = document.getElementById("openAddFoodMobile");
   const closeAddFoodBtn = document.getElementById("closeAddFood");
   const statsContainer = document.getElementById("foodStats");
   const filterSelect = document.getElementById("timeFilter");
   const goalForm = document.getElementById("goalForm");
   const goalInput = document.getElementById("goalInput");
   const goalTypeSelect = document.getElementById("goalTypeSelect");
- 
 
-  // Modal controls
+  // modal handlers
   openAddFoodBtn?.addEventListener("click", () => {
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
+    modal?.classList.remove("hidden");
+    modal?.classList.add("flex");
   });
-  closeAddFoodBtn?.addEventListener("click", () => modal.classList.add("hidden"));
+  openAddFoodMobile?.addEventListener("click", () => {
+    modal?.classList.remove("hidden");
+    modal?.classList.add("flex");
+  });
+  closeAddFoodBtn?.addEventListener("click", () => modal?.classList.add("hidden"));
 
-  // Authenticated user
+  // ensure signed in
   const user = await getValidSession();
   if (!user) return;
 
-  // Load initial data
+  // initial loading
   await loadUserGoal(user);
   await loadFoodEntries(user.id);
-  await loadDailyGoalAndProgress();
+  await loadDailyGoalAndProgress(user);
 
-  setupRealtimeListener(user);
+  // consolidated realtime
+  setupRealtime(user);
 
-  // Filters
-  filterSelect?.addEventListener("change", (e) =>
-    loadFoodEntries(user.id, e.target.value)
-  );
-
-  // Save goal
+  // UI events
+  filterSelect?.addEventListener("change", (e) => loadFoodEntries(user.id, e.target.value));
   goalForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     await saveUserGoal(user);
   });
-
-  // Add food
   foodForm?.addEventListener("submit", (e) => handleFoodSubmit(e, user));
 
-  // ✅ Load user goal
-  async function loadUserGoal(user) {
-    const { data, error } = await supabase
-      .from(GOAL_TABLE)
-      .select("*")
-      .eq("user_id", user.id)
-      .single();
+  // ---------- FUNCTIONS ----------
 
-    if (error && error.code !== "PGRST116") {
-      console.error("Error loading goal:", error);
+  // load user goal to populate form + cache
+  async function loadUserGoal(user) {
+    try {
+      const { data, error } = await supabase.from(GOAL_TABLE).select("*").eq("user_id", user.id).single();
+      if (error && error.code !== "PGRST116") {
+        console.error("Error loading goal:", error);
+        showToast("Could not load goal", "error");
+        userGoal = { goal_value: 0, goal_type: "daily" };
+        return;
+      }
+      if (data) {
+        userGoal = data;
+        if (goalInput) goalInput.value = data.goal_value;
+        if (goalTypeSelect) goalTypeSelect.value = data.goal_type;
+      } else {
+        userGoal = { goal_value: 0, goal_type: "daily" };
+      }
+    } catch (err) {
+      console.error("loadUserGoal err:", err);
+    }
+  }
+
+  // upsert user goal
+  async function saveUserGoal(user) {
+    const value = parseFloat(goalInput?.value || "0");
+    const type = goalTypeSelect?.value || "daily";
+    if (!value || value <= 0) {
+      showToast("Enter a valid positive goal value", "error");
       return;
     }
-
-    if (data) {
-      goalInput.value = data.goal_value;
-      goalTypeSelect.value = data.goal_type;
-    }else{
-       userGoal = { goal_value: 0, goal_type: "daily" };
+    showLoading();
+    try {
+      const { data, error } = await supabase
+        .from(GOAL_TABLE)
+        .upsert({ user_id: user.id, goal_type: type, goal_value: value, updated_at: new Date() }, { onConflict: "user_id" })
+        .select("*")
+        .single();
+      hideLoading();
+      if (error) throw error;
+      userGoal = data;
+      showToast("Goal saved!", "success");
+      await loadDailyGoalAndProgress(user); // refresh progress immediately
+    } catch (err) {
+      hideLoading();
+      console.error("saveUserGoal err:", err);
+      showToast("Failed to save goal", "error");
     }
   }
 
-  
-
-  // ✅ Save user goal (Upsert)
-  async function saveUserGoal(user) {
-    const goalValue = parseFloat(goalInput.value);
-    const goalType = goalTypeSelect.value;
-
-    const { data, error } = await supabase
-      .from(GOAL_TABLE)
-      .upsert(
-        {
-          user_id: user.id,
-          goal_type: goalType,
-          goal_value: goalValue,
-          updated_at: new Date(),
-        },
-        { onConflict: "user_id" }
-      )
-      .select("*")
-      .single();
-
-    if (error) {
-      console.error("❌ Save goal error:", error);
-      showToast("Failed to save goal.", "error");
-    } else {
-      showToast("✅ Goal saved successfully!", "success");
-      await loadUserGoal(user);
-    }
-  }
-
-  // ✅ Handle adding new food
+  // add food entry
   async function handleFoodSubmit(e, user) {
     e.preventDefault();
-    const foodName = document.getElementById("foodName")?.value.trim();
-    const calories = parseInt(document.getElementById("calories")?.value, 10);
-    const date =
-      document.getElementById("date")?.value ||
-      new Date().toISOString().split("T")[0];
+    const foodName = (document.getElementById("foodName")?.value || "").trim();
+    const calories = parseInt(document.getElementById("calories")?.value || "", 10);
+    const date = document.getElementById("date")?.value || new Date().toISOString().split("T")[0];
     const fileInput = document.getElementById("foodImage");
-    const file = fileInput?.files[0];
+    const file = fileInput?.files?.[0];
 
     if (!foodName || Number.isNaN(calories)) {
       showToast("Please fill all fields correctly", "error");
@@ -202,124 +196,68 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     let imageUrl = null;
     if (file) {
-      const filePath = `${user.id}/${Date.now()}-${file.name}`;
-      const { error: uploadError } = await supabase.storage
-        .from(BUCKET)
-        .upload(filePath, file);
-      if (uploadError) {
-        showToast("Image upload failed", "error");
-        return;
+      showLoading();
+      try {
+        const filePath = `${user.id}/${Date.now()}-${file.name}`;
+        const { error: uploadErr } = await supabase.storage.from(BUCKET).upload(filePath, file);
+        if (uploadErr) {
+          hideLoading();
+          console.error("uploadErr:", uploadErr);
+          showToast("Image upload failed", "error");
+          return;
+        }
+        const { data: pub } = supabase.storage.from(BUCKET).getPublicUrl(filePath);
+        imageUrl = pub?.publicUrl ?? null;
+      } catch (err) {
+        hideLoading();
+        console.error("handleFoodSubmit upload err:", err);
+      } finally {
+        hideLoading();
       }
-      const { data } = supabase.storage.from(BUCKET).getPublicUrl(filePath);
-      imageUrl = data.publicUrl;
     }
 
     try {
       showLoading();
-      const { error } = await supabase.from(FOOD_TABLE).insert([
-        {
-          foodName,
-          calories,
-          date,
-          imageUrl,
-          user_id: user.id,
-        },
-      ]);
-      if (error) throw error;
-      foodForm.reset();
-      showToast("Food entry added!", "success");
-      modal.classList.add("hidden");
-      await loadFoodEntries(user.id);
-    } catch (err) {
-      console.error(err);
-      showToast("Failed to add entry", "error");
-    } finally {
+      const { error } = await supabase.from(FOOD_TABLE).insert([{ foodName, calories, date, imageUrl, user_id: user.id }]);
       hideLoading();
+      if (error) throw error;
+      showToast("Food entry added!", "success");
+      foodForm.reset();
+      modal?.classList.add("hidden");
+      await loadFoodEntries(user.id);
+      await loadDailyGoalAndProgress(user);
+    } catch (err) {
+      hideLoading();
+      console.error("Insert error:", err);
+      showToast("Failed to add entry", "error");
     }
   }
 
-  // ✅ Load and render food entries
+  // load food entries and render
   async function loadFoodEntries(userId, filter = "all") {
     try {
-      const { data, error } = await supabase
-        .from(FOOD_TABLE)
-        .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.from(FOOD_TABLE).select("*").eq("user_id", userId).order("created_at", { ascending: false });
       if (error) throw error;
-
-      const filteredData = filterEntriesByTime(data, filter);
-      renderFoodList(filteredData);
-      updateStats(filteredData);
-      renderCalorieChart(filteredData);
+      const arr = Array.isArray(data) ? data : [];
+      const filtered = filterEntriesByTime(arr, filter);
+      renderFoodList(filtered);
+      updateStats(filtered);
+      renderCalorieChart(filtered);
     } catch (err) {
-      console.error("Error loading entries:", err);
+      console.error("loadFoodEntries err:", err);
       foodList.innerHTML = `<p class="text-center text-gray-500 p-4">Failed to load entries.</p>`;
     }
   }
 
-  //Goal progress-bar
-  async function loadDailyGoalAndProgress() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
-
-  // Fetch daily goal
-  const { data: goalData, error: goalError } = await supabase
-    .from("user_goal")
-    .select("*")
-    .eq("user_id", user.id)
-    .eq("goal_type", "daily")
-    .single();
-
-  if (goalError || !goalData) {
-    console.log("No daily goal found");
-    return;
-  }
-
-  const dailyGoal = goalData.goal_value;
-
-  // Fetch today’s entries
-  const today = new Date().toISOString().split("T")[0];
-  const { data: entries } = await supabase
-    .from("food_entries")
-    .select("calories, created_at")
-    .eq("user_id", user.id);
-
-  const todaysEntries = entries.filter(entry => entry.created_at.startsWith(today));
-  const totalCalories = todaysEntries.reduce((sum, e) => sum + e.calories, 0);
-
-  // Calculate progress
-  const percent = Math.min((totalCalories / dailyGoal) * 100, 100);
-  const progress = document.getElementById("dailyProgress");
-  const progressText = document.getElementById("progressText");
-
-  if (progress) {
-    progress.style.width = `${percent}%`;
-
-    // Color feedback based on progress
-    if (totalCalories >= dailyGoal) {
-      progress.classList.remove("bg-[#3b82f6]");
-      progress.classList.add("bg-red-500", "animate-pulse");
-    } else {
-      progress.classList.remove("bg-red-500", "animate-pulse");
-      progress.classList.add("bg-[#3b82f6]");
-    }
-  }
-
-  if (progressText) {
-    progressText.textContent = `${totalCalories} / ${dailyGoal} kcal`;
-  }
-}
-
-
-  // ✅ Filter entries by time
-  function filterEntriesByTime(entries, filterType) {
+  // safe filter by week/month/all
+  function filterEntriesByTime(entries = [], filterType) {
+    if (!Array.isArray(entries)) return [];
     if (filterType === "all") return entries;
     const now = new Date();
-
     return entries.filter((entry) => {
-      const entryDate = new Date(entry.date);
-
+      const dateStr = entry.date ?? entry.created_at ?? null;
+      if (!dateStr) return false;
+      const entryDate = new Date(dateStr);
       if (filterType === "week") {
         const startOfWeek = new Date(now);
         startOfWeek.setDate(now.getDate() - now.getDay());
@@ -327,34 +265,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         endOfWeek.setDate(startOfWeek.getDate() + 7);
         return entryDate >= startOfWeek && entryDate < endOfWeek;
       }
-
       if (filterType === "month") {
-        return (
-          entryDate.getMonth() === now.getMonth() &&
-          entryDate.getFullYear() === now.getFullYear()
-        );
+        return entryDate.getMonth() === now.getMonth() && entryDate.getFullYear() === now.getFullYear();
       }
-
       return true;
     });
   }
 
-  // ✅ Render calories chart
-  function renderCalorieChart(entries) {
+  // render chart with Chart.js
+  function renderCalorieChart(entries = []) {
     const ctx = document.getElementById("caloriesChart");
     if (!ctx) return;
-
     const grouped = entries.reduce((acc, e) => {
-      const date = e.date.split("T")[0];
-      acc[date] = (acc[date] || 0) + Number(e.calories);
+      const key = (e.date ?? e.created_at ?? "").split("T")[0] || "unknown";
+      acc[key] = (acc[key] || 0) + Number(e.calories || 0);
       return acc;
     }, {});
-
     const labels = Object.keys(grouped).sort();
     const data = labels.map((d) => grouped[d]);
-
     if (caloriesChart) caloriesChart.destroy();
-
     caloriesChart = new Chart(ctx, {
       type: "line",
       data: {
@@ -381,97 +310,90 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // ✅ Update stats section
-  function updateStats(items) {
-  if (!statsContainer) return;
-  if (!items.length) {
-    statsContainer.innerHTML = `<div class="text-center font-bold text-gray-500">No data yet</div>`;
-    return;
-  }
+  // update the summary stats and show progress
+  function updateStats(items = []) {
+    if (!statsContainer) return;
+    if (!items.length) {
+      statsContainer.innerHTML = `<div class="text-center font-bold text-gray-500">No data yet</div>`;
+      return;
+    }
 
-  // Filter for goal type
-  let relevantItems = items;
-  const now = new Date();
-  if (userGoal.goal_type === "daily") {
-    relevantItems = items.filter(
-      (i) => new Date(i.date).toDateString() === now.toDateString()
-    );
-  } else if (userGoal.goal_type === "weekly") {
-    const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - now.getDay());
-    relevantItems = items.filter((i) => new Date(i.date) >= startOfWeek);
-  } else if (userGoal.goal_type === "monthly") {
-    relevantItems = items.filter(
-      (i) =>
-        new Date(i.date).getMonth() === now.getMonth() &&
-        new Date(i.date).getFullYear() === now.getFullYear()
-    );
-  }
+    // compute relevant items according to userGoal
+    let relevant = items;
+    const now = new Date();
+    if (userGoal?.goal_type === "daily") {
+      relevant = items.filter((i) => {
+        const d = new Date(i.date ?? i.created_at ?? "");
+        return d.toDateString() === now.toDateString();
+      });
+    } else if (userGoal?.goal_type === "weekly") {
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay());
+      relevant = items.filter((i) => new Date(i.date ?? i.created_at ?? "") >= startOfWeek);
+    } else if (userGoal?.goal_type === "monthly") {
+      relevant = items.filter((i) => {
+        const d = new Date(i.date ?? i.created_at ?? "");
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      });
+    }
 
-  const totalCalories = relevantItems.reduce(
-    (sum, i) => sum + (Number(i.calories) || 0),
-    0
-  );
-  const averageCalories = (totalCalories / relevantItems.length || 0).toFixed(1);
-  const goalValue = userGoal.goal_value || 2000; // fallback
-  const progress = Math.min((totalCalories / goalValue) * 100, 100);
+    const totalCalories = relevant.reduce((sum, i) => sum + (Number(i.calories) || 0), 0);
+    const averageCalories = relevant.length ? (totalCalories / relevant.length).toFixed(1) : 0;
+    const goalValue = (userGoal && userGoal.goal_value) ? Number(userGoal.goal_value) : 2000;
+    const progressPct = Math.min((totalCalories / goalValue) * 100, 100);
 
-  statsContainer.innerHTML = `
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-4 text-center">
-      <div class="bg-white p-4 rounded-xl shadow">
-        <h3 class="text-gray-500 text-sm">Total Calories</h3>
-        <p class="text-2xl font-bold text-green-600">${totalCalories} kcal</p>
-      </div>
-      <div class="bg-white p-4 rounded-xl shadow">
-        <h3 class="text-gray-500 text-sm">Goal Progress (${userGoal.goal_type})</h3>
-        <div class="w-full bg-gray-200 h-3 rounded-full mt-2 overflow-hidden">
-          <div class="bg-emerald-500 h-3 rounded-full transition-all duration-700" style="width: ${progress}%;"></div>
+    statsContainer.innerHTML = `
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-4 text-center">
+        <div class="bg-white p-4 rounded-xl shadow">
+          <h3 class="text-gray-500 text-sm">Total Calories</h3>
+          <p class="text-2xl font-bold text-green-600">${totalCalories} kcal</p>
         </div>
-        <p class="text-sm mt-1 text-gray-600">${progress.toFixed(1)}% of goal (${goalValue} kcal)</p>
+        <div class="bg-white p-4 rounded-xl shadow">
+          <h3 class="text-gray-500 text-sm">Goal Progress (${escapeHtml(userGoal.goal_type)})</h3>
+          <div class="w-full bg-gray-200 h-3 rounded-full mt-2 overflow-hidden">
+            <div class="bg-emerald-500 h-3 rounded-full transition-all duration-700" style="width: ${progressPct}%;"></div>
+          </div>
+          <p class="text-sm mt-1 text-gray-600">${progressPct.toFixed(1)}% of goal (${goalValue} kcal)</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow">
+          <h3 class="text-gray-500 text-sm">Average per Entry</h3>
+          <p class="text-2xl font-bold text-blue-600">${averageCalories} kcal</p>
+        </div>
       </div>
-      <div class="bg-white p-4 rounded-xl shadow">
-        <h3 class="text-gray-500 text-sm">Average per Entry</h3>
-        <p class="text-2xl font-bold text-blue-600">${averageCalories} kcal</p>
-      </div>
-    </div>`;
-}
-if (progress >= 100) {
-  showToast(`🎉 You’ve reached your ${userGoal.goal_type} goal!`, "success");
-}
+    `;
+    if (progressPct >= 100) showToast(`🎉 You reached your ${userGoal.goal_type} goal!`, "success");
+  }
 
-
-
-  // ✅ Render food cards
-  function renderFoodList(items) {
+  // render food cards + attach delete handlers
+  function renderFoodList(items = []) {
     if (!foodList) return;
     if (!items.length) {
       foodList.innerHTML = `<div class="p-6 text-center text-gray-500">No food entries yet. Click "Add Food" to create one.</div>`;
       return;
     }
 
-    foodList.innerHTML = `
+    const html = `
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         ${items
           .map((entry) => {
             const name = escapeHtml(entry.foodName ?? "Unknown Food");
-            const date = escapeHtml(entry.date ?? "");
-            const calories = Number(entry.calories) || 0;
+            const d = entry.date ?? entry.created_at ?? "";
+            const dateStr = escapeHtml((d || "").split("T")[0] || d);
+            const calories = Number(entry.calories || 0);
             const image = escapeHtml(entry.imageUrl ?? "https://via.placeholder.com/400");
-            const goalValue = userGoal.goal_value || 2000;
-const progress = Math.min((calories / goalValue) * 100, 100);
-
-
+            const goalValue = (userGoal && userGoal.goal_value) ? Number(userGoal.goal_value) : 2000;
+            const progress = Math.min((calories / (goalValue || 2000)) * 100, 100);
             return `
               <div class="bg-white rounded-2xl shadow-lg overflow-hidden transition duration-500 hover:scale-[1.02]">
                 <img src="${image}" alt="${name}" class="w-full h-48 object-cover" />
                 <div class="p-4">
                   <h2 class="text-lg font-semibold text-gray-800">${name}</h2>
-                  <p class="text-gray-500 text-sm">${date}</p>
+                  <p class="text-gray-500 text-sm">${dateStr}</p>
                   <div class="flex items-center justify-between mt-3">
                     <div class="w-full bg-gray-200 h-2 rounded-full mr-2 overflow-hidden">
                       <div class="bg-emerald-500 h-2 rounded-full transition-all duration-700" style="width: ${progress}%;"></div>
                     </div>
-                    <span class="text-gray-700 text-sm">${calories} / 2000 kcal</span>
+                    <span class="text-gray-700 text-sm">${calories} kcal</span>
                   </div>
                   <div class="mt-4 flex justify-end">
                     <button data-id="${entry.id}" class="delete-entry text-red-600 hover:underline font-medium">Delete</button>
@@ -480,8 +402,11 @@ const progress = Math.min((calories / goalValue) * 100, 100);
               </div>`;
           })
           .join("")}
-      </div>`;
+      </div>
+    `;
+    foodList.innerHTML = html;
 
+    // delete handlers
     foodList.querySelectorAll(".delete-entry").forEach((btn) =>
       btn.addEventListener("click", async (e) => {
         const id = e.currentTarget.getAttribute("data-id");
@@ -489,28 +414,112 @@ const progress = Math.min((calories / goalValue) * 100, 100);
         try {
           showLoading();
           const { error } = await supabase.from(FOOD_TABLE).delete().eq("id", id);
+          hideLoading();
           if (error) throw error;
           showToast("Entry deleted", "success");
           await loadFoodEntries(user.id);
+          await loadDailyGoalAndProgress(user);
         } catch (err) {
+          hideLoading();
           console.error("Delete failed:", err);
           showToast("Failed to delete", "error");
-        } finally {
-          hideLoading();
         }
       })
     );
   }
 
-  // ✅ Real-time listener
-  function setupRealtimeListener(user) {
+  // load daily goal and update progress bar (safe, uses FOOD_TABLE)
+  async function loadDailyGoalAndProgress(user) {
+    try {
+      // re-fetch goal (keeps cache up to date)
+      const { data: goalData, error: goalError } = await supabase.from(GOAL_TABLE).select("*").eq("user_id", user.id).eq("goal_type", "daily").single();
+      if (!goalError && goalData) userGoal = goalData;
+
+      const dailyGoal = (userGoal && userGoal.goal_value) ? Number(userGoal.goal_value) : 2000;
+
+      // fetch today's entries with server-side range filter (safer for timezones)
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const { data: entries, error: entriesError } = await supabase
+        .from(FOOD_TABLE)
+        .select("calories, date, created_at")
+        .eq("user_id", user.id)
+        .gte("created_at", startOfDay.toISOString())
+        .lte("created_at", endOfDay.toISOString());
+
+      if (entriesError) {
+        // fallback: try selecting without date range (still safe)
+        console.warn("entries range query failed, trying without range:", entriesError);
+        const { data: fallback, error: fallbackErr } = await supabase.from(FOOD_TABLE).select("calories, date, created_at").eq("user_id", user.id);
+        if (fallbackErr || !Array.isArray(fallback)) {
+          console.error("Failed to fetch entries:", fallbackErr || "no data");
+          updateProgressBar(0, dailyGoal);
+          return;
+        }
+        // filter by today client-side if needed
+        const today = new Date().toISOString().split("T")[0];
+        const todays = fallback.filter((row) => ((row.date ?? row.created_at) || "").split("T")[0] === today);
+        const total = todays.reduce((sum, r) => sum + Number(r.calories || 0), 0);
+        updateProgressBar(total, dailyGoal);
+        return;
+      }
+
+      const arr = Array.isArray(entries) ? entries : [];
+      if (!arr.length) {
+        updateProgressBar(0, dailyGoal);
+        return;
+      }
+
+      // compute total calories for today (created_at may already be restricted, extra safety)
+      const todayStr = new Date().toISOString().split("T")[0];
+      const todaysEntries = arr.filter((entry) => ((entry.date ?? entry.created_at) || "").split("T")[0] === todayStr);
+      const totalCalories = todaysEntries.reduce((sum, e) => sum + Number(e.calories || 0), 0);
+
+      updateProgressBar(totalCalories, dailyGoal);
+    } catch (err) {
+      console.error("loadDailyGoalAndProgress err:", err);
+    }
+  }
+
+  // update progress bar element (supports multiple ID names)
+  function updateProgressBar(totalCalories, dailyGoal) {
+    const bar = document.getElementById("dailyProgress") || document.getElementById("goalProgressBar");
+    const txt = document.getElementById("progressText") || document.getElementById("goalProgressText");
+    const percent = dailyGoal > 0 ? Math.min((totalCalories / dailyGoal) * 100, 100) : 0;
+
+    if (bar) {
+      bar.style.transition = "width 0.7s ease-in-out";
+      bar.style.width = `${percent}%`;
+      // color classes: prefer tailwind-like classes, fallback to inline color
+      bar.classList.remove("bg-red-500", "animate-pulse", "bg-[#10b981]");
+      if (totalCalories >= dailyGoal) {
+        bar.classList.add("bg-red-500", "animate-pulse");
+      } else {
+        try {
+          bar.classList.add("bg-[#10b981]");
+        } catch {
+          bar.style.backgroundColor = "#10b981";
+        }
+      }
+    }
+
+    if (txt) txt.textContent = `${totalCalories} / ${dailyGoal} kcal`;
+  }
+
+  // single realtime subscription (food inserts/updates/deletes for this user)
+  function setupRealtime(user) {
+    const channelName = `foodCollection-user-${user.id}`;
     supabase
-      .channel("foodCollection-updates")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: FOOD_TABLE },
-        async () => loadFoodEntries(user.id)
-      )
-      .subscribe();
+      .channel(channelName)
+      .on("postgres_changes", { event: "*", schema: "public", table: FOOD_TABLE, filter: `user_id=eq.${user.id}` }, async (payload) => {
+        console.log("Realtime payload:", payload);
+        await loadFoodEntries(user.id);
+        await loadDailyGoalAndProgress(user);
+      })
+      .subscribe()
+      
   }
 });
