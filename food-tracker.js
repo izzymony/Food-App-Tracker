@@ -22,9 +22,8 @@ let userGoal = { goal_value: 0, goal_type: "daily" };
 function showToast(message, type = "info") {
   const el = document.createElement("div");
   el.textContent = message;
-  el.className = `fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded shadow text-white z-[9999] ${
-    type === "error" ? "bg-red-600" : type === "success" ? "bg-emerald-600" : "bg-gray-800"
-  }`;
+  el.className = `fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded shadow text-white z-[9999] ${type === "error" ? "bg-red-600" : type === "success" ? "bg-emerald-600" : "bg-gray-800"
+    }`;
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 2500);
 }
@@ -87,9 +86,9 @@ async function getValidSession() {
 document.addEventListener("DOMContentLoaded", async () => {
 
   // DOM refs
-  const GEMINI_KEY = 'AIzaSyA3lA_bE-90KZUpoYubpzsYhWzrC5SjAws'
+  // const GEMINI_KEY = ... (moved to config.js)
   const estimateResult = document.getElementById("estimateResult");
-  const estimateBtn  = document.getElementById('estimateBtn')
+  const estimateBtn = document.getElementById('estimateBtn')
   const estimateButtons = document.getElementById("estimateButtons");
   const foodForm = document.getElementById("foodForm");
   const foodList = document.getElementById("foodList");
@@ -187,36 +186,37 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Helper function for Gemini Ai eSTIMATION
 
-  estimation?.addEventListener("click", async() =>{
-     const foodName = (document.getElementById('foodName')?.value || "").trim();
-      const fileInput = document.getElementById("foodImage");
-     const file = fileInput?.files?.[0];
+  estimateBtn?.addEventListener("click", async () => {
+    const foodName = (document.getElementById('foodName')?.value || "").trim();
+    const fileInput = document.getElementById("foodImage");
+    const file = fileInput?.files?.[0];
 
-    if(!foodName){
+    if (!foodName) {
       showToast('please enter a food name', 'error')
       return;
     }
 
-    try{
+    try {
       estimateBtn.disabled = true;
       estimateBtn.textContent = "Thinking...";
 
       let imagePort = null;
 
-      if(file){
-        const base64Data = await new Promise((resolve)=>{
+      if (file) {
+        const base64Data = await new Promise((resolve) => {
           const reader = new FileReader();
-          reader.onloadend = () => resolve(renderCalorieChart.result.split(',')[1])
+          reader.onloadend = () => resolve(reader.result.split(',')[1])
           reader.readAsDataURL(file);
         })
-        imagePort = {inlineData: {minType: file.type, data:base64Data}};
+        imagePort = { inlineData: { mimeType: file.type, data: base64Data } };
       }
 
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${CONFIG.GEMINI_KEY}`;
       const payload = {
-        contents:[{
+        contents: [{
           parts: [
-            {text:`Estimate the calories for "${foodName}", ReturnONLY a JSON object with this format: {"min": number, "max": number, "avg": number}. 
+            {
+              text: `Estimate the calories for "${foodName}", ReturnONLY a JSON object with this format: {"min": number, "max": number, "avg": number}. 
             Do not include markdown formatting or backticks.`},
             ...(imagePort ? [imagePort] : [])
           ]
@@ -224,21 +224,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       };
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: {"Content-Type" : "application/json"},
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       })
 
       const data = await response.json();
-      const text =  data.candidates?.[0]?.content?.parts?.[0]?.text;
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-      if(!text) throw new Error("No response from AI")
+      if (!text) throw new Error("No response from AI")
 
-        const cleanJson = text.replace(/```json|```/g, "").trim();
-        const result = JSON.parse(cleanJson);
+      const cleanJson = text.replace(/```json|```/g, "").trim();
+      const result = JSON.parse(cleanJson);
 
-        estimateResult.classList.remove("hidden")
+      estimateResult.classList.remove("hidden")
 
-        estimateButtons.innerHTML = `
+      estimateButtons.innerHTML = `
 
            <button type="button" class="est-opt px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 text-xs shadow-sm">
           Low: ${result.min}
@@ -251,17 +251,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         </button>
         `;
 
-        estimateButtons.querySelectorAll(".est-opt").forEach(btn => {
-          btn.addEventListener("click", () =>{
-            const val = btn.innerText.split(":")[1].trim();
-            document.getElementById('calories').value = val;
-            estimateResult.classList.add("hidden");
-          })
+      estimateButtons.querySelectorAll(".est-opt").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const val = btn.innerText.split(":")[1].trim();
+          document.getElementById('calories').value = val;
+          estimateResult.classList.add("hidden");
         })
-    }catch (err) {
-       console.error(err);
+      })
+    } catch (err) {
+      console.error(err);
       showToast("Could not estimate calories", "error");
-    }finally {
+    } finally {
       estimateBtn.disabled = false;
       estimateBtn.textContent = "✨ Estimate";
     }
@@ -461,15 +461,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const html = `
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         ${items
-          .map((entry) => {
-            const name = escapeHtml(entry.foodName ?? "Unknown Food");
-            const d = entry.date ?? entry.created_at ?? "";
-            const dateStr = escapeHtml((d || "").split("T")[0] || d);
-            const calories = Number(entry.calories || 0);
-            const image = escapeHtml(entry.imageUrl ?? "https://via.placeholder.com/400");
-            const goalValue = (userGoal && userGoal.goal_value) ? Number(userGoal.goal_value) : 2000;
-            const progress = Math.min((calories / (goalValue || 2000)) * 100, 100);
-            return `
+        .map((entry) => {
+          const name = escapeHtml(entry.foodName ?? "Unknown Food");
+          const d = entry.date ?? entry.created_at ?? "";
+          const dateStr = escapeHtml((d || "").split("T")[0] || d);
+          const calories = Number(entry.calories || 0);
+          const image = escapeHtml(entry.imageUrl ?? "https://via.placeholder.com/400");
+          const goalValue = (userGoal && userGoal.goal_value) ? Number(userGoal.goal_value) : 2000;
+          const progress = Math.min((calories / (goalValue || 2000)) * 100, 100);
+          return `
               <div class="bg-white rounded-2xl shadow-lg overflow-hidden transition duration-500 hover:scale-[1.02]">
                 <img src="${image}" alt="${name}" class="w-full h-48 object-cover" />
                 <div class="p-4">
@@ -486,8 +486,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                   </div>
                 </div>
               </div>`;
-          })
-          .join("")}
+        })
+        .join("")}
       </div>
     `;
     foodList.innerHTML = html;
@@ -606,6 +606,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         await loadDailyGoalAndProgress(user);
       })
       .subscribe()
-      
+
   }
 });
