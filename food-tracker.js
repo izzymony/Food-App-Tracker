@@ -85,7 +85,12 @@ async function getValidSession() {
 
 // ---------- MAIN ----------
 document.addEventListener("DOMContentLoaded", async () => {
+
   // DOM refs
+  const GEMINI_KEY = 'AIzaSyA3lA_bE-90KZUpoYubpzsYhWzrC5SjAws'
+  const estimateResult = document.getElementById("estimateResult");
+  const estimateBtn  = document.getElementById('estimateBtn')
+  const estimateButtons = document.getElementById("estimateButtons");
   const foodForm = document.getElementById("foodForm");
   const foodList = document.getElementById("foodList");
   const modal = document.getElementById("addFoodModal");
@@ -180,6 +185,87 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // Helper function for Gemini Ai eSTIMATION
+
+  estimation?.addEventListener("click", async() =>{
+     const foodName = (document.getElementById('foodName')?.value || "").trim();
+      const fileInput = document.getElementById("foodImage");
+     const file = fileInput?.files?.[0];
+
+    if(!foodName){
+      showToast('please enter a food name', 'error')
+      return;
+    }
+
+    try{
+      estimateBtn.disabled = true;
+      estimateBtn.textContent = "Thinking...";
+
+      let imagePort = null;
+
+      if(file){
+        const base64Data = await new Promise((resolve)=>{
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(renderCalorieChart.result.split(',')[1])
+          reader.readAsDataURL(file);
+        })
+        imagePort = {inlineData: {minType: file.type, data:base64Data}};
+      }
+
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
+      const payload = {
+        contents:[{
+          parts: [
+            {text:`Estimate the calories for "${foodName}", ReturnONLY a JSON object with this format: {"min": number, "max": number, "avg": number}. 
+            Do not include markdown formatting or backticks.`},
+            ...(imagePort ? [imagePort] : [])
+          ]
+        }]
+      };
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {"Content-Type" : "application/json"},
+        body: JSON.stringify(payload)
+      })
+
+      const data = await response.json();
+      const text =  data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if(!text) throw new Error("No response from AI")
+
+        const cleanJson = text.replace(/```json|```/g, "").trim();
+        const result = JSON.parse(cleanJson);
+
+        estimateResult.classList.remove("hidden")
+
+        estimateButtons.innerHTML = `
+
+           <button type="button" class="est-opt px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 text-xs shadow-sm">
+          Low: ${result.min}
+        </button>
+        <button type="button" class="est-opt px-3 py-1 bg-blue-100 border border-blue-300 rounded hover:bg-blue-200 text-xs font-bold shadow-sm">
+          Avg: ${result.avg}
+        </button>
+        <button type="button" class="est-opt px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 text-xs shadow-sm">
+          High: ${result.max}
+        </button>
+        `;
+
+        estimateButtons.querySelectorAll(".est-opt").forEach(btn => {
+          btn.addEventListener("click", () =>{
+            const val = btn.innerText.split(":")[1].trim();
+            document.getElementById('calories').value = val;
+            estimateResult.classList.add("hidden");
+          })
+        })
+    }catch (err) {
+       console.error(err);
+      showToast("Could not estimate calories", "error");
+    }finally {
+      estimateBtn.disabled = false;
+      estimateBtn.textContent = "✨ Estimate";
+    }
+  })
   // add food entry
   async function handleFoodSubmit(e, user) {
     e.preventDefault();
