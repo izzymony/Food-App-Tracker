@@ -1,0 +1,11 @@
+{
+              "name": "food-app-tracker",
+              "version": "1.0.0",
+              "description": "Food Tracker App",
+              "scripts": {
+                            "build": "node generate-config.js"
+              },
+              "keywords": [],
+              "author": "",
+              "license": "ISC"
+}
