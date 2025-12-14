@@ -1,0 +1,11 @@
+{
+  "name": "food-app-tracker",
+  "version": "1.0.0",
+  "description": "Food Tracker App",
+  "scripts": {
+    "build": "echo const CONFIG = { GEMINI_KEY: '${GEMINI_KEY}' }; > config.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
