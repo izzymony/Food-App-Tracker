@@ -229,9 +229,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       };
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify(payload)
       })
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      }
 
       const data = await response.json();
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
