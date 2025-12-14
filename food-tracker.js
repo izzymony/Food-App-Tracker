@@ -211,7 +211,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         imagePort = { inlineData: { mimeType: file.type, data: base64Data } };
       }
 
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${CONFIG.GEMINI_KEY}`;
+      if (typeof CONFIG === "undefined" || !CONFIG.GEMINI_KEY) {
+        showToast("Missing API Key in config.js", "error");
+        return;
+      }
+
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${CONFIG.GEMINI_KEY}`;
       const payload = {
         contents: [{
           parts: [
