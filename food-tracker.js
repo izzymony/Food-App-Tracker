@@ -184,99 +184,69 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  const CALORIE_DB = {
+  "jollof rice": 350,
+  "fried rice": 400,
+  "beans": 130,
+  "black beans": 132,
+  "kidney beans": 127,
+  "pinto beans": 143,
+  "chickpeas": 164,
+  "lentils": 118,
+  "burger": 450,
+  "pizza slice": 300,
+  "apple": 95,
+  "banana": 105,
+  "egg": 70,
+  "yam": 118,
+  "plantain": 122,
+  "spaghetti": 158,
+  "noodles": 138,
+  "chicken breast": 165,
+  "fish fillet": 206
+};
+
   // Helper function for Gemini Ai eSTIMATION
+estimateBtn?.addEventListener("click", () => {
+  const foodName = (document.getElementById("foodName")?.value || "").trim().toLowerCase();
+  if (!foodName) {
+    showToast("Please enter a food name", "error");
+    return;
+  }
 
-  estimateBtn?.addEventListener("click", async () => {
-    const foodName = (document.getElementById('foodName')?.value || "").trim();
-    const fileInput = document.getElementById("foodImage");
-    const file = fileInput?.files?.[0];
+  const calories = CALORIE_DB[foodName];
+  if (!calories) {
+    showToast("Food not found in database", "error");
+    return;
+  }
 
-    if (!foodName) {
-      showToast('please enter a food name', 'error')
-      return;
-    }
+  const min = Math.round(calories * 0.9);
+  const avg = Math.round(calories);
+  const max = Math.round(calories * 1.1);
 
-    try {
-      estimateBtn.disabled = true;
-      estimateBtn.textContent = "Thinking...";
+  estimateResult.classList.remove("hidden");
+  estimateButtons.innerHTML = `
+    <button type="button" class="est-opt px-3 py-1 border rounded text-xs">
+      Low: ${min}
+    </button>
+    <button type="button" class="est-opt px-3 py-1 border rounded text-xs font-bold bg-blue-100">
+      Avg: ${avg}
+    </button>
+    <button type="button" class="est-opt px-3 py-1 border rounded text-xs">
+      High: ${max}
+    </button>
+  `;
 
-      let imagePort = null;
+  estimateButtons.querySelectorAll(".est-opt").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const val = btn.innerText.split(":")[1].trim();
+      document.getElementById("calories").value = val;
+      estimateResult.classList.add("hidden");
+    });
+  });
+});
 
-      if (file) {
-        const base64Data = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result.split(',')[1])
-          reader.readAsDataURL(file);
-        })
-        imagePort = { inlineData: { mimeType: file.type, data: base64Data } };
-      }
-
-      if (typeof CONFIG === "undefined" || !CONFIG.GEMINI_KEY) {
-        showToast("Missing API Key in config.js", "error");
-        return;
-      }
-
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${CONFIG.GEMINI_KEY}`;
-      const payload = {
-        contents: [{
-          parts: [
-            {
-              text: `Estimate the calories for "${foodName}", ReturnONLY a JSON object with this format: {"min": number, "max": number, "avg": number}. 
-            Do not include markdown formatting or backticks.`},
-            ...(imagePort ? [imagePort] : [])
-          ]
-        }]
-      };
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      })
-
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-      if (!text) throw new Error("No response from AI")
-
-      const cleanJson = text.replace(/```json|```/g, "").trim();
-      const result = JSON.parse(cleanJson);
-
-      estimateResult.classList.remove("hidden")
-
-      estimateButtons.innerHTML = `
-
-           <button type="button" class="est-opt px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 text-xs shadow-sm">
-          Low: ${result.min}
-        </button>
-        <button type="button" class="est-opt px-3 py-1 bg-blue-100 border border-blue-300 rounded hover:bg-blue-200 text-xs font-bold shadow-sm">
-          Avg: ${result.avg}
-        </button>
-        <button type="button" class="est-opt px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 text-xs shadow-sm">
-          High: ${result.max}
-        </button>
-        `;
-
-      estimateButtons.querySelectorAll(".est-opt").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const val = btn.innerText.split(":")[1].trim();
-          document.getElementById('calories').value = val;
-          estimateResult.classList.add("hidden");
-        })
-      })
-    } catch (err) {
-      console.error(err);
-      showToast("Could not estimate calories", "error");
-    } finally {
-      estimateBtn.disabled = false;
-      estimateBtn.textContent = "✨ Estimate";
-    }
-  })
+ 
   // add food entry
   async function handleFoodSubmit(e, user) {
     e.preventDefault();
